@@ -3,32 +3,39 @@ import SwiftGodot
 @Godot
 final class Player: CharacterBody2D {
 
-    private let speed: Float = 200.0
+    private let speed: Float = 100.0
+    private let acceleration: Float = 800.0
+    private let friction: Float = 1000.0
     private let jumpVelocity: Float = -300.0
 
     private var gravity: Float {
-        .init(
-            ProjectSettings.getSettingWithOverride(name: "physics/2d/default_gravity")
-        )!
+        .init(ProjectSettings.getSettingWithOverride(name: "physics/2d/default_gravity"))!
     }
 
     override func _physicsProcess(delta: Double) {
-        // Add gravity
-        if isOnFloor() == false {
-            velocity.y += gravity * .init(delta)
+        let delta = Float(delta)
+        let isOnFloor = isOnFloor()
+
+        // Apply gravity
+        if isOnFloor == false {
+            velocity.y += gravity * delta
         }
 
         // Handle jump
-        if Input.isActionJustPressed(action: "ui_accept"), isOnFloor() {
+        if isOnFloor, Input.isActionJustPressed(action: "ui_accept") {
             velocity.y = jumpVelocity
+        } else if Input.isActionJustReleased(action: "ui_accept"), velocity.y < jumpVelocity / 2 {
+            velocity.y = jumpVelocity / 2
         }
 
-        // Handle movement or deceleration
-        let direction = Input.getAxis(negativeAction: "ui_left", positiveAction: "ui_right")
-        if direction != .zero {
-            velocity.x = .init(direction) * speed
+        let inputAxis: Float = Input.getAxis(negativeAction: "ui_left", positiveAction: "ui_right")
+
+        if inputAxis != .zero {
+            // Accelerate
+            velocity.x = GD.moveToward(from: velocity.x, to: speed * inputAxis, delta: acceleration * delta)
         } else {
-            velocity.x = Float(GD.moveToward(from: .init(velocity.x), to: 0, delta: .init(speed)))
+            // Apply friction
+            velocity.x = GD.moveToward(from: velocity.x, to: 0, delta: friction * delta)
         }
 
         moveAndSlide()

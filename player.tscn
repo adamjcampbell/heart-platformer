@@ -6,6 +6,8 @@
 size = Vector2(16, 16)
 
 [node name="Player" type="Player"]
+floor_constant_speed = true
+floor_snap_length = 2.0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.125, 0.125)
