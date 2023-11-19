@@ -13,6 +13,7 @@ final class Player: CharacterBody2D {
     }
 
     @SceneTree(path: "AnimatedSprite2D") var animatedSprite2D: AnimatedSprite2D!
+    @SceneTree(path: "CoyoteJumpTimer") var coyoteJumpTimer: Timer!
 
     override func _physicsProcess(delta: Double) {
         guard Engine.isEditorHint() == false else {
@@ -20,17 +21,16 @@ final class Player: CharacterBody2D {
         }
 
         let delta = Float(delta)
-        let isOnFloor = isOnFloor()
 
         // Apply gravity
-        if isOnFloor == false {
+        if isOnFloor() == false {
             velocity.y += gravity * delta
         }
 
         // Handle jump
-        if isOnFloor, Input.isActionJustPressed(action: "ui_accept") {
+        if isOnFloor() || coyoteJumpTimer.timeLeft > 0, Input.isActionJustPressed(action: "ui_up") {
             velocity.y = jumpVelocity
-        } else if Input.isActionJustReleased(action: "ui_accept"), velocity.y < jumpVelocity / 2 {
+        } else if Input.isActionJustReleased(action: "ui_up"), velocity.y < jumpVelocity / 2 {
             velocity.y = jumpVelocity / 2
         }
 
@@ -52,11 +52,19 @@ final class Player: CharacterBody2D {
             animatedSprite2D.play(name: "idle")
         }
 
-        if isOnFloor == false {
+        if isOnFloor() == false {
             animatedSprite2D.play(name: "jump")
         }
 
+        let wasOnFloor = isOnFloor()
+
         moveAndSlide()
+
+        let wasOnLedge = wasOnFloor && isOnFloor() == false && velocity.y >= 0
+
+        if wasOnLedge {
+            coyoteJumpTimer.start()
+        }
     }
 
 }
