@@ -10,7 +10,10 @@ let package = Package(
         .library(name: "Driver", type: .dynamic, targets: ["Driver"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/migueldeicaza/SwiftGodot", branch: "main"),
+        .package(
+            url: "https://github.com/migueldeicaza/SwiftGodot",
+            revision: "92e145300b5f2f71d989fb045fe7312e1dd9ff71"
+        ),
     ],
     targets: [
         .target(
