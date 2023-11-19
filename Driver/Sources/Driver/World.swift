@@ -10,6 +10,13 @@ final class World: Node2D {
     var polygon2D: Polygon2D!
 
     override func _ready() {
+        guard Engine.isEditorHint() == false else {
+            return
+        }
+
+        polygon2D.polygon = collisionPolygon2D.polygon
+
+        RenderingServer.setDefaultClearColor(.black)
     }
 
 }

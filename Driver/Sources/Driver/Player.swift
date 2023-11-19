@@ -12,6 +12,8 @@ final class Player: CharacterBody2D {
         .init(ProjectSettings.getSettingWithOverride(name: "physics/2d/default_gravity"))!
     }
 
+    @SceneTree(path: "AnimatedSprite2D") var animatedSprite2D: AnimatedSprite2D!
+
     override func _physicsProcess(delta: Double) {
         guard Engine.isEditorHint() == false else {
             return
@@ -40,6 +42,18 @@ final class Player: CharacterBody2D {
         } else {
             // Apply friction
             velocity.x = GD.moveToward(from: velocity.x, to: 0, delta: friction * delta)
+        }
+
+        // Animation
+        if inputAxis != .zero {
+            animatedSprite2D.flipH = inputAxis < 0
+            animatedSprite2D.play(name: "run")
+        } else {
+            animatedSprite2D.play(name: "idle")
+        }
+
+        if isOnFloor == false {
+            animatedSprite2D.play(name: "jump")
         }
 
         moveAndSlide()
