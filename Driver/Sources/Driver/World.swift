@@ -10,7 +10,6 @@ final class World: Node2D {
     var polygon2D: Polygon2D!
 
     override func _ready() {
-        polygon2D.color = .red
     }
 
 }

@@ -13,6 +13,10 @@ final class Player: CharacterBody2D {
     }
 
     override func _physicsProcess(delta: Double) {
+        guard Engine.isEditorHint() == false else {
+            return
+        }
+
         let delta = Float(delta)
         let isOnFloor = isOnFloor()
 
